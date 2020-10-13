@@ -36,23 +36,23 @@
     var isOldIE = /MSIE [0-8]\./i.test(userAgent);
     var isOperaMini = userAgent.indexOf('Opera Mini') > -1;
 
-    // var isMobileSafari = /(iPhone|iPod|iPad).+AppleWebKit/i.test(userAgent) && (function() {
-    //   // Regexp for iOS-version tested against the following userAgent strings:
-    //   // Example WebView UserAgents:
-    //   // * iOS Chrome on iOS8: "Mozilla/5.0 (iPad; CPU OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) CriOS/39.0.2171.50 Mobile/12B410 Safari/600.1.4"
-    //   // * iOS Facebook on iOS7: "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D201 [FBAN/FBIOS;FBAV/12.1.0.24.20; FBBV/3214247; FBDV/iPhone6,1;FBMD/iPhone; FBSN/iPhone OS;FBSV/7.1.1; FBSS/2; FBCR/AT&T;FBID/phone;FBLC/en_US;FBOP/5]"
-    //   // Example Safari UserAgents:
-    //   // * Safari iOS8: "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"
-    //   // * Safari iOS7: "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A4449d Safari/9537.53"
-    //   var iOSversion = userAgent.match(/OS (\d+)/);
-    //   // viewport units work fine in mobile Safari and webView on iOS 8+
-    //   return iOSversion && iOSversion.length > 1 && parseInt(iOSversion[1]) < 10;
-    // })();
+    var isMobileSafari = /(iPhone|iPod|iPad).+AppleWebKit/i.test(userAgent) && (function() {
+      // Regexp for iOS-version tested against the following userAgent strings:
+      // Example WebView UserAgents:
+      // * iOS Chrome on iOS8: "Mozilla/5.0 (iPad; CPU OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) CriOS/39.0.2171.50 Mobile/12B410 Safari/600.1.4"
+      // * iOS Facebook on iOS7: "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D201 [FBAN/FBIOS;FBAV/12.1.0.24.20; FBBV/3214247; FBDV/iPhone6,1;FBMD/iPhone; FBSN/iPhone OS;FBSV/7.1.1; FBSS/2; FBCR/AT&T;FBID/phone;FBLC/en_US;FBOP/5]"
+      // Example Safari UserAgents:
+      // * Safari iOS8: "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"
+      // * Safari iOS7: "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A4449d Safari/9537.53"
+      var iOSversion = userAgent.match(/OS (\d+)/);
+      // viewport units work fine in mobile Safari and webView on iOS 8+
+      return iOSversion && iOSversion.length > 1 && parseInt(iOSversion[1]) < 10;
+    })();
 
-    // target safari in old and new ipad versions
-    var isMobileSafari = (function() {
-      const iPad = (userAgent.match(/(iPad)/) /* iOS pre 13 */ || 
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) /* iPad OS 13 */);
+    var isIpad = (function () {
+      const iPad = (userAgent.match(/(iPad)/) /* iOS pre 13 */ ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) /* iPad OS 13 */);
+
       return iPad;
     })();
 
@@ -139,6 +139,7 @@
 
       options = initOptions || {};
       options.isMobileSafari = isMobileSafari;
+      options.isIpad = isIpad;
       options.isBadStockAndroid = isBadStockAndroid;
 
       if (options.ignoreVmax && !options.force && !isOldIE) {
@@ -149,7 +150,7 @@
         isBuggyIE = false;
       }
 
-      if (isOldIE || (!options.force && !isMobileSafari && !isBuggyIE && !isBadStockAndroid && !isOperaMini && (!options.hacks || !options.hacks.required(options)))) {
+      if (isOldIE || (!options.force && !isMobileSafari && !isIpad && !isBuggyIE && !isBadStockAndroid && !isOperaMini && (!options.hacks || !options.hacks.required(options)))) {
         // this buggyfill only applies to mobile safari, IE9-10 and the Stock Android Browser.
         if (window.console && isOldIE) {
           console.info('viewport-units-buggyfill requires a proper CSSOM and basic viewport unit support, which are not available in IE8 and below');
